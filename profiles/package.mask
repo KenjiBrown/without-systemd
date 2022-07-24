@@ -1,3 +1,4 @@
+# systemd is masked in without-systemd overlay
 sys-apps/systemd
 sys-apps/systemd-tmpfiles
 sys-apps/systemd-utils
