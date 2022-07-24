@@ -1,0 +1,4 @@
+sys-apps/systemd
+sys-apps/systemd-tmpfiles
+sys-apps/systemd-utils
+sys-apps/gentoo-systemd-integration
