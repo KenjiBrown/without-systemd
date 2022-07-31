@@ -1,4 +1,4 @@
-#Without Systemd Gentoo Overlay
+# Without Systemd Gentoo Overlay
 
 Use eselect repository to enable this overlay
 
@@ -6,7 +6,7 @@ Use eselect repository to enable this overlay
 eselect repository add without-systemd git https://github.com/KenjiBrown/without-systemd.git
 ```
 
-##Issues: 
+## Issues: 
 	`profiles/package.mask` can only mask packages in this overlay. A symbolic link to `/etc/portage/package/mask/` is needed to effectively mask Gentoo'systemd packages.
 
 ```
