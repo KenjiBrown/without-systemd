@@ -21,6 +21,7 @@ SLOT="0"
 IUSE="selinux"
 
 RDEPEND="!<sys-apps/openrc-0.23
+	!sys-apps/opentmpfiles
 	selinux? ( sec-policy/selinux-base-policy )"
 
 src_prepare() {
