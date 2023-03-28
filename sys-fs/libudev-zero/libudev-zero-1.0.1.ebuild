@@ -5,7 +5,6 @@ EAPI=8
 
 DESCRIPTION="Drop-in replacement for libudev intended to work with any device manager"
 HOMEPAGE="https://github.com/illiliti/libudev-zero"
-# https://github.com/illiliti/libudev-zero/archive/refs/tags/1.0.1.tar.gz
 SRC_URI="https://github.com/illiliti/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="ISC"
