@@ -5,18 +5,18 @@ EAPI=8
 
 KV_MIN=2.6.39
 
-inherit linux-info multilib-minimal toolchain-funcs udev
+inherit autotools linux-info multilib-minimal toolchain-funcs udev
 
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="https://github.com/eudev-project/eudev.git"
-	inherit autotools git-r3
+	inherit git-r3
 else
 	MY_PV=${PV/_pre/-pre}
 	SRC_URI="https://github.com/eudev-project/eudev/releases/download/v${MY_PV}/${PN}-${MY_PV}.tar.gz"
 	S="${WORKDIR}"/${PN}-${MY_PV}
 
 	if [[ ${PV} != *_pre* ]] ; then
-		KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+		KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 sparc x86"
 	fi
 fi
 
@@ -116,9 +116,10 @@ src_prepare() {
 	sed -e 's/GROUP="dialout"/GROUP="uucp"/' -i rules/*.rules \
 		|| die "failed to change group dialout to uucp"
 
-	if [[ ${PV} == 9999* ]] ; then
+	# required for the sticky-tags patch
+	#if [[ ${PV} == 9999* ]] ; then
 		eautoreconf
-	fi
+	#fi
 }
 
 rootprefix() {
