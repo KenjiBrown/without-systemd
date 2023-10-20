@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+# Copyright 2023 Gentoo Authors
+# Released under MIT license.
+
+description="Create Volatile Files and Directories"
+
+depend()
+{
+	provide tmpfiles-setup tmpfiles.setup
+	need localmount
+}
+
+start()
+{
+	ebegin "${description}"
+	tmpfilesd --create --remove --boot --exclude-prefix=/dev
+	eend $?
+}

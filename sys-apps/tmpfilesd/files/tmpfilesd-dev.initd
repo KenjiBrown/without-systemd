@@ -1,0 +1,20 @@
+#!/sbin/openrc-run
+# Copyright 2023 Gentoo Authors
+# Released under the MIT license.
+
+description="Create Static Devices Nodes in /dev"
+
+depend()
+{
+	provide tmpfiles-dev tmpfiles.dev
+	use dev-mount
+	before dev
+	keyword -prefix -vserver
+}
+
+start()
+{
+	ebegin "${description}"
+	tmpfilesd --prefix=/dev --create --boot
+	eend $?
+}
