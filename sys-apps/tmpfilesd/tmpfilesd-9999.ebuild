@@ -20,8 +20,8 @@ src_install() {
 	emake DESTDIR="${ED}" install
 	einstalldocs
 	cd misc
-	insinto /etc/cron.daily
-	doexe "${FILESDIR}/tmpfilesd-clean"
+	exeinto /etc/cron.daily
+	doexe "${FILESDIR}"/tmpfilesd-clean
 	for f in tmpfilesd-dev tmpfilesd-setup; do
 		newconfd tmpfilesd.sysconfig ${f}
 		newinitd "${FILESDIR}/${f}.initd" ${f}
