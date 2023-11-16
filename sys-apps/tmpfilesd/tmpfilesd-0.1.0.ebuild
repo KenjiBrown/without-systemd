@@ -31,8 +31,14 @@ src_install() {
 	emake DESTDIR="${ED}" install
 	einstalldocs
 	cd misc
+	dotmpfiles tmpfiles-d/etc.conf # Sets /etc/localtime to UTC
+	dotmpfiles tmpfiles-d/legacy.conf # Not sure if this is needed
+	dotmpfiles tmpfiles-d/sap.conf # harmless if not using sap; Consider USE=sap
+	#dotmpfiles tmpfiles-d/systemd-nologin.conf # should be provided by systemd
+	#dotmpfiles tmpfiles-d/systemd.conf # should be provided by systemd
 	dotmpfiles tmpfiles-d/tmp.conf # harmless
 	dotmpfiles tmpfiles-d/var.conf # changed permissions should be investigated
+	dotmpfiles tmpfiles-d/x11.conf # Xorg creates these. Consider USE=X
 	exeinto /etc/cron.daily
 	doexe "${FILESDIR}"/tmpfilesd-clean
 	for f in tmpfilesd-dev tmpfilesd-setup; do
@@ -51,8 +57,14 @@ add_service() {
 }
 
 pkg_postinst() {
-	tmpfiles_process tmp.conf
+	tmpfiles_process etc.conf
+	tmpfiles_process legacy.conf
+	tmpfiles_process sap.conf
+	#tmpfiles_process systemd-nologin.conf # should be provided by systemd
+	#tmpfiles_process systemd.conf # should be provided by systemd
+	tmpfiles_process tmp.conf 
 	tmpfiles_process var.conf
+	tmpfiles_process x11.conf
 	if [[ -z $REPLACING_VERSIONS ]]; then
 		add_service tmpfilesd-dev sysinit
 		add_service tmpfilesd-setup boot
