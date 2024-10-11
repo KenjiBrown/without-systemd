@@ -1,7 +1,8 @@
 # Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
+inherit prefix
 
 if [[ ${PV} = 9999* ]]; then
 	inherit git-r3
@@ -9,7 +10,7 @@ if [[ ${PV} = 9999* ]]; then
 else
 	SRC_URI="https://github.com/openrc/${PN}/archive/${PV}.tar.gz ->
 		${P}.tar.gz"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~~s390 ~sparc ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~x64-cygwin ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 fi
 
 DESCRIPTION="A standalone utility to process systemd-style tmpfiles.d files"
@@ -17,12 +18,18 @@ HOMEPAGE="https://github.com/openrc/opentmpfiles"
 
 LICENSE="BSD-2"
 SLOT="0"
-IUSE=""
+IUSE="selinux"
 
-RDEPEND="!<sys-apps/openrc-0.23"
+RDEPEND="!<sys-apps/openrc-0.23
+	selinux? ( sec-policy/selinux-base-policy )"
 
-src_install() {
+src_prepare() {
 	default
+	hprefixify tmpfiles
+}
+src_install() {
+	emake DESTDIR="${ED}" install
+	einstalldocs
 	cd openrc
 	for f in opentmpfiles-dev opentmpfiles-setup; do
 		newconfd ${f}.confd ${f}
@@ -35,10 +42,13 @@ add_service() {
 	local runlevel=$2
 
 	elog "Auto-adding '${initd}' service to your ${runlevel} runlevel"
+	mkdir -p "${EROOT}"etc/runlevels/${runlevel}
 	ln -snf /etc/init.d/${initd} "${EROOT}"etc/runlevels/${runlevel}/${initd}
 }
 
 pkg_postinst() {
-	add_service opentmpfiles-dev sysinit
-	add_service opentmpfiles-setup boot
+	if [[ -z $REPLACING_VERSIONS ]]; then
+		add_service opentmpfiles-dev sysinit
+		add_service opentmpfiles-setup boot
+	fi
 }
