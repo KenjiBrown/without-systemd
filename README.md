@@ -3,7 +3,7 @@
 Use eselect repository to enable this overlay
 
 ```
-eselect repository add without-systemd git https://github.com/KenjiBrown/without-systemd.git
+eselect repository add without-systemd git https://github.com/canoine/without-systemd.git
 ```
 
 ## Issues: 
