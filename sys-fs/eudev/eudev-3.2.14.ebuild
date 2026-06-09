@@ -1,4 +1,4 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -78,16 +78,20 @@ MULTILIB_WRAPPED_HEADERS=(
 )
 
 pkg_pretend() {
-	ewarn
-	ewarn "As of 2013-01-29, ${PN} provides the new interface renaming functionality,"
-	ewarn "as described in the URL below:"
-	ewarn "https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames"
-	ewarn
-	ewarn "This functionality is enabled BY DEFAULT because eudev has no means of synchronizing"
-	ewarn "between the default or user-modified choice of sys-fs/udev.  If you wish to disable"
-	ewarn "this new iface naming, please be sure that /etc/udev/rules.d/80-net-name-slot.rules"
-	ewarn "exists: touch /etc/udev/rules.d/80-net-name-slot.rules"
-	ewarn
+	if ! use rule-generator; then
+		ewarn
+		ewarn "As of 2013-01-29, ${PN} provides the new interface renaming functionality,"
+		ewarn "as described in the URL below:"
+		ewarn "https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames"
+		ewarn
+		ewarn "If you wish to disable this new iface naming, please be sure that"
+		ewarn "/etc/udev/rules.d/80-net-name-slot.rule exists:"
+		ewarn "# touch /etc/udev/rules.d/80-net-name-slot.rules"
+		ewarn
+		ewarn "Alternatively, consider USE=rule-generator, as a way to create persistent"
+		ewarn "iface naming. You don't need to create 80-net-name-slot.rules in this case."
+		ewarn
+	fi
 }
 
 pkg_setup() {
