@@ -216,6 +216,15 @@ multilib_src_install_all() {
 	doins "${FILESDIR}"/40-gentoo.rules
 
 	use rule-generator && doinitd "${FILESDIR}"/udev-postmount
+
+	# Create symlinks for split-usr
+	# While sys-fs/udev-init-scripts still uses /sbin/udevd, it makes no sense
+	# to move everything to /usr yet. Other udev rules will also still depend
+	# on this for the time being.
+	if use split-usr; then
+		# sys-auth/elogind requires /usr/bin/udevadm in 71-seat.rules
+		dosym ../../bin/udevadm /usr/bin/udevadm
+	fi
 }
 
 pkg_postrm() {
