@@ -3,5 +3,3 @@ sys-apps/systemd
 sys-apps/systemd-tmpfiles
 sys-apps/systemd-utils
 sys-apps/gentoo-systemd-integration
-# Gentoo's virtual/tmpfiles depends exclusively on systemd
-virtual/tmpfiles::gentoo
