@@ -9,6 +9,8 @@
     <flag name="rule-generator">install legacy rule generator rules and support scripts - note
     that the functionality within was dropped from <pkg>sys-fs/udev</pkg> as it is not stable in
     all cases; use at your own risk</flag>
+    <flag name="predictable-ifnames">Use the modern predictable interface names.
+    Sets the default value for 'net.ifnames=' on the kernel command-line</flag>
   </use>
   <upstream>
     <remote-id type="github">eudev-project/eudev</remote-id>
