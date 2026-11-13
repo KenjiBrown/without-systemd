@@ -25,7 +25,7 @@ HOMEPAGE="https://github.com/eudev-project/eudev"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="+kmod rule-generator selinux split-usr static-libs test"
+IUSE="+kmod +predictable-ifnames rule-generator selinux split-usr static-libs test"
 RESTRICT="!test? ( test )"
 
 DEPEND="
@@ -39,11 +39,9 @@ DEPEND="
 "
 RDEPEND="
 	${DEPEND}
-	acct-group/input
-	acct-group/kvm
-	acct-group/render
 	acct-group/audio
 	acct-group/cdrom
+	acct-group/clock
 	acct-group/dialout
 	acct-group/disk
 	acct-group/floppy
@@ -69,32 +67,31 @@ BDEPEND="
 		dev-lang/perl
 	)
 "
-PDEPEND=">=sys-fs/udev-init-scripts-26"
+PDEPEND=">=sys-fs/udev-init-scripts-34"
 
-MULTILIB_WRAPPED_HEADERS=(
-	/usr/include/udev.h
-)
+CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED
+	~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~UNIX"
 
 pkg_pretend() {
-	if ! use rule-generator; then
+	if use predictable-ifnames && [[ ${REPLACING_VERSIONS} == *3.2.* ]]; then
 		ewarn
 		ewarn "As of 2013-01-29, ${PN} provides the new interface renaming functionality,"
 		ewarn "as described in the URL below:"
 		ewarn "https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames"
 		ewarn
-		ewarn "If you wish to disable this new iface naming, please be sure that"
-		ewarn "/etc/udev/rules.d/80-net-name-slot.rule exists:"
-		ewarn "# touch /etc/udev/rules.d/80-net-name-slot.rules"
+		ewarn "If you wish to disable this new iface naming, set USE=-predictable-ifnames"
+		ewarn "for this package, or net.ifnames=0 on the kernel command line."
 		ewarn
-		ewarn "Alternatively, consider USE=rule-generator, as a way to create persistent"
-		ewarn "iface naming. You don't need to create 80-net-name-slot.rules in this case."
+		ewarn "Additionally, consider USE=rule-generator, as a way to create persistent"
+		ewarn "iface naming. You can use this in combination with USE=-predictable-ifnames"
 		ewarn
 	fi
 }
 
 pkg_setup() {
-	CONFIG_CHECK="~BLK_DEV_BSG ~DEVTMPFS ~!IDE ~INOTIFY_USER ~!SYSFS_DEPRECATED ~!SYSFS_DEPRECATED_V2 ~SIGNALFD ~EPOLL ~FHANDLE ~NET ~UNIX"
-	linux-info_pkg_setup
+	if [[ ${MERGE_TYPE} != buildonly ]]; then
+		linux-info_pkg_setup
+	fi
 	get_running_version
 
 	# These are required kernel options, but we don't error out on them
@@ -109,11 +106,6 @@ pkg_setup() {
 
 src_prepare() {
 	default
-
-	# Change rules back to group uucp instead of dialout for now
-	sed -e 's/GROUP="dialout"/GROUP="uucp"/' -i rules/*.rules \
-		|| die "failed to change group dialout to uucp"
-
 	if [[ ${PV} == 9999* ]] ; then
 		eautoreconf
 	fi
@@ -130,16 +122,8 @@ sbindir() {
 multilib_src_configure() {
 	# bug #463846
 	tc-export CC
-	# bug #502950
-	export cc_cv_CFLAGS__flto=no
 
 	local myeconfargs=(
-		ac_cv_search_cap_init=
-		ac_cv_header_sys_capability_h=yes
-
-		DBUS_CFLAGS=' '
-		DBUS_LIBS=' '
-
 		--with-rootprefix="${EPREFIX}$(rootprefix)"
 		--with-rootrundir=/run
 		--exec-prefix="${EPREFIX}"
@@ -161,6 +145,7 @@ multilib_src_configure() {
 			$(use_enable static-libs static)
 			$(use_enable selinux)
 			$(use_enable rule-generator)
+			$(use_with predictable-ifnames net-ifnames-default)
 		)
 	else
 		myeconfargs+=(
